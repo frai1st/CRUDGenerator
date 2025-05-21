@@ -1,12 +1,12 @@
 const fs = require('fs')
 
-// Template com várias tabelas e múltiplas foreign keys
+// Template
+const templates = []
 
 // leitor de template
 function generateColumnCode(columnName, properties) {
     let code = "table"
-    const type = ["increments", "string", "date", "integer", "boolean", "text"]
-      .find(t => properties.includes(t))
+    const type = properties.find(p => ["string", "date", "integer", "boolean", "text", "increments"].includes(p))
   
     if (type === "string") code += `.string('${columnName}', 80)`
     else if (type === "increments") code += `.increments('${columnName}')`
@@ -18,7 +18,7 @@ function generateColumnCode(columnName, properties) {
     if (properties.some(p => p.startsWith("foreign"))) code += `.unsigned()`
   
     properties.forEach(prop => {
-      if (prop === "primary" && !properties.includes("increments")) code += `.primary()`
+      if (prop === "primary" && type !== "increments") code += `.primary()`
       if (prop === "notNullable") code += `.notNullable()`
     })
   
@@ -163,6 +163,6 @@ server.listen({ port: 3000 }, (err, address) => {
 }
 
 // arquivo final
-// const codigoFinal = gerarProjetoCompleto(templates)
-// fs.writeFileSync('appGerated.js', codigoFinal)
-// console.log('gerado appGerated.js')
+const codigoFinal = gerarProjetoCompleto(templates)
+fs.writeFileSync('appGerated.js', codigoFinal)
+console.log('gerado appGerated.js')
