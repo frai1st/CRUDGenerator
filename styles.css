@@ -20,7 +20,7 @@
     /* Background & Text Colors */
     --dark: #0F172A;
     --dark-800: #1E293B;
-    --dark-700: #334155;
+    --dark-700: #2d3b4e;
     --dark-600: #475569;
     --gray-100: #f1f5f9;
     --gray-200: #e2e8f0;
@@ -756,6 +756,12 @@ header {
     transition: all var(--transition-fast);
 }
 
+select.form-input option {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 0.5rem;
+}
+
 .form-input:focus {
     outline: none;
     border-color: var(--primary);
@@ -1100,7 +1106,7 @@ header {
     padding: 0.25rem 0.5rem;
     border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.1);
-    color: var(--text-tertiary);
+    color: var(--text-secondary);
 }
 
 /* Utility Classes */
