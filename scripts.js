@@ -1,1362 +1,1452 @@
-// DOM Elements
-const appSwitcher = document.getElementById('app-switcher');
-const endpointSwitch = document.getElementById('endpoint-switch');
-const generatorSwitch = document.getElementById('generator-switch');
-const endpointView = document.getElementById('endpoint-tester-view');
-const generatorView = document.getElementById('fastify-generator-view');
-const themeToggle = document.getElementById('theme-toggle');
-const schemaModal = document.getElementById('schema-modal');
-const closeModal = document.getElementById('close-modal');
-const loadingOverlay = document.getElementById('loading-overlay');
-const generateButton = document.getElementById('generate-ui');
-const formatButton = document.getElementById('format-code');
-const codeEditor = document.getElementById('code-editor');
-const codePreview = document.getElementById('code-preview');
-const previewContainer = document.getElementById('preview-container');
-const endpointsContainer = document.getElementById('endpoints-container');
-const viewSchemaButton = document.getElementById('view-schema');
-const schemaContent = document.getElementById('schema-content');
-const startTourButton = document.getElementById('start-tour');
-
-// Theme toggle
-themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('light-theme');
-    localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
-});
-
-// Check for saved theme
-if (localStorage.getItem('theme') === 'light') {
-    document.body.classList.add('light-theme');
-}
-
-// Tour functionality
-function startTour() {
-    const intro = introJs();
+/* Core Variables */
+:root {
+    /* Core Colors */
+    --primary: #6C5CE7;
+    --primary-dark: #4834d4;
+    --primary-light: #a29bfe;
+    --secondary: #00b894;
+    --secondary-dark: #00a183;
+    --secondary-light: #55efc4;
+    --accent: #ff7675;
+    --accent-hover: #e84118;
+    --accent-light: #fab1a0;
+    --tertiary: #fdcb6e;
+    --tertiary-light: #ffeaa7;
+    --success: #00b894;
+    --warning: #f39c12;
+    --danger: #ff7675;
+    --info: #0984e3;
     
-    // Set options
-    intro.setOptions({
-        steps: [
-            {
-                element: '#app-switcher',
-                intro: 'This application has two main features.',
-                position: 'bottom'
-            },
-            {
-                element: '#endpoint-switch',
-                intro: 'API Explorer allows you to test and visualize your API endpoints.',
-                position: 'bottom'
-            },
-            {
-                element: '#generator-switch',
-                intro: 'Generator creates database schema and generates Fastify API code automatically.',
-                position: 'bottom'
-            },
-            {
-                element: '.editor-panel',
-                intro: 'Here you can paste your Fastify API code for visualization.',
-                position: 'right'
-            },
-            {
-                element: '#generate-ui',
-                intro: 'Click this button to generate an interactive UI from your code.',
-                position: 'left'
-            },
-            {
-                element: '.result-panel',
-                intro: 'Interactive endpoints will appear here after generation.',
-                position: 'left'
-            },
-            {
-                element: '.fg-left-panel',
-                intro: 'In the Generator, you can build your database schema by adding tables and columns.',
-                position: 'right'
-            },
-            {
-                element: '.fg-output-container',
-                intro: 'View the generated JSON schema and download the complete Fastify API code.',
-                position: 'left'
-            },
-            {
-                element: '#start-tour',
-                intro: 'You can restart this tour anytime by clicking this button.',
-                position: 'left'
-            }
-        ],
-        showStepNumbers: false,
-        showBullets: true,
-        exitOnOverlayClick: true,
-        exitOnEsc: true,
-        nextLabel: 'Next',
-        prevLabel: 'Previous',
-        skipLabel: 'Skip',
-        doneLabel: 'Done'
-    });
+    /* Background & Text Colors */
+    --dark: #0F172A;
+    --dark-800: #1E293B;
+    --dark-700: #2d3b4e;
+    --dark-600: #475569;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --white: #ffffff;
     
-    // Add event handlers for page switching during tour
-    intro.onbeforechange(function(targetElement) {
-        // Check which step we're on by finding the current element in our steps
-        const currentStep = intro._currentStep;
-        
-        // If we're moving to step 6 (Generator tables) or 7 (Generator JSON output)
-        if (currentStep === 6 || currentStep === 7) {
-            // Switch to Generator view if not already active
-            if (!generatorView.classList.contains('active')) {
-                generatorSwitch.click();
-            }
-        } else if (currentStep >= 3 && currentStep <= 5) {
-            // If we're on steps for API Explorer (step 3, 4, or 5)
-            // Switch to API Explorer view if not already active
-            if (!endpointView.classList.contains('active')) {
-                endpointSwitch.click();
-            }
-        }
-    });
+    /* Fonts */
+    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    --font-body: 'Inter', sans-serif;
     
-    // Start the tour
-    intro.start();
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Border Radius */
+    --radius-xs: 0.25rem; /* 4px */
+    --radius-sm: 0.375rem; /* 6px */
+    --radius: 0.5rem;      /* 8px */
+    --radius-md: 0.75rem;  /* 12px */
+    --radius-lg: 1rem;     /* 16px */
+    --radius-xl: 1.5rem;   /* 24px */
+    --radius-2xl: 2rem;    /* 32px */
+    --radius-full: 9999px; /* Fully round */
+    
+    /* Dark theme variables (default) */
+    --bg-primary: var(--dark);
+    --bg-secondary: var(--dark-800);
+    --bg-tertiary: var(--dark-700);
+    --bg-card: var(--dark-800);
+    --text-primary: var(--white);
+    --text-secondary: var(--gray-300);
+    --text-tertiary: var(--gray-500);
+    --border-color: var(--dark-700);
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Z-index layers */
+    --z-negative: -1;
+    --z-normal: 1;
+    --z-tooltip: 10;
+    --z-fixed: 100;
+    --z-modal: 1000;
+    
+    /* Spacing */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-xxl: 3rem;
 }
 
-// Start tour button
-if (startTourButton) {
-    startTourButton.addEventListener('click', startTour);
+/* Light theme */
+.light-theme {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --bg-card: #ffffff;
+    --text-primary: var(--gray-900);
+    --text-secondary: var(--gray-700);
+    --text-tertiary: var(--gray-500);
+    --border-color: var(--gray-200);
 }
 
-// Show tour automatically on first visit
-if (!localStorage.getItem('tourShown')) {
-    // Set small timeout to ensure DOM is ready
-    setTimeout(startTour, 800);
-    localStorage.setItem('tourShown', 'true');
+/* Reset and base styles */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-// App switcher
-endpointSwitch.addEventListener('click', () => {
-    endpointSwitch.classList.add('active');
-    generatorSwitch.classList.remove('active');
-    appSwitcher.classList.remove('second-active');
-    endpointView.classList.add('active');
-    generatorView.classList.remove('active');
-});
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
 
-generatorSwitch.addEventListener('click', () => {
-    generatorSwitch.classList.add('active');
-    endpointSwitch.classList.remove('active');
-    appSwitcher.classList.add('second-active');
-    generatorView.classList.add('active');
-    endpointView.classList.remove('active');
-});
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    transition: var(--transition-normal);
+    position: relative;
+}
 
-// Modal controls
-closeModal.addEventListener('click', () => {
-    schemaModal.classList.remove('visible');
-});
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    line-height: 1.2;
+    font-family: var(--font-sans);
+    letter-spacing: -0.02em;
+}
 
-schemaModal.addEventListener('click', (e) => {
-    if (e.target === schemaModal) {
-        schemaModal.classList.remove('visible');
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* Main Container */
+.main-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background Elements */
+.bg-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.1) 0%, rgba(0, 184, 148, 0.05) 100%);
+    z-index: var(--z-negative);
+    pointer-events: none;
+}
+
+.bg-blob {
+    position: absolute;
+    border-radius: var(--radius-full);
+    filter: blur(80px);
+    opacity: 0.2;
+    z-index: var(--z-negative);
+    pointer-events: none;
+}
+
+/* Header */
+header {
+    padding: 1.5rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: var(--z-normal);
+    position: relative;
+}
+
+/* App Switcher */
+.app-switcher {
+    display: flex;
+    padding: 0.25rem;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.app-switch-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    transition: color var(--transition-fast);
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-btn:hover {
+    color: var(--text-primary);
+  }
+  
+
+.app-switch-btn.active {
+    color: var(--gray-100);
+}
+
+.app-switcher::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    height: calc(100% - 8px);
+    width: calc(50% - 4px);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: calc(var(--radius-full) - 4px);
+    transition: transform var(--transition-normal);
+}
+
+.app-switcher.second-active::before {
+    transform: translateX(100%);
+}
+
+/* Header Actions */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.theme-toggle {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle:hover {
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.light-icon, .dark-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform var(--transition-normal);
+}
+
+.light-icon {
+    display: block;
+}
+
+.dark-icon {
+    display: none;
+}
+
+.light-theme .light-icon {
+    display: none;
+}
+
+.light-theme .dark-icon {
+    display: block;
+}
+
+.help-button {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 2rem 2rem;
+}
+
+/* Dashboard grid layout */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.5rem;
+    height: calc(100vh - 12rem);
+    min-height: 600px;
+}
+
+/* Glass Card Effect */
+.glass-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.18);
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.glass-card:hover {
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.25);
+}
+
+.light-theme .glass-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.3) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Editor Panel */
+.editor-panel {
+    grid-column: span 6; 
+    display: flex;
+    flex-direction: column;
+    height: 107%;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.panel-title svg {
+    color: var(--secondary);
+    width: 24px;
+    height: 24px;
+}
+
+.panel-title h2 {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.panel-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.editor-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.code-textarea {
+    width: 100%;
+    height: 100%;
+    padding: 1.5rem;
+    background-color: rgba(15, 23, 42, 0.9);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    border: none;
+    resize: none;
+    line-height: 1.7;
+    outline: none;
+}
+
+.light-theme .code-textarea {
+    background-color: rgba(255, 255, 255, 0.95);
+    color: var(--dark-800);
+}
+
+.preview-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.95);
+    overflow: auto;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-normal);
+}
+
+.preview-container.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.light-theme .preview-container {
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.preview-container pre {
+    margin: 0;
+    padding: 1.5rem;
+}
+
+/* Results Panel */
+.result-panel {
+    grid-column: span 6;
+    display: flex;
+    flex-direction: column;
+    height: 107%;
+}
+
+.result-content {
+    flex: 1;
+    padding: 1.25rem;
+    overflow: auto;
+}
+
+/* Initial State */
+.initial-state {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 0 1.5rem;
+}
+
+.welcome-message {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.welcome-icon {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 25px -5px rgba(108, 92, 231, 0.5);
+    margin-bottom: 1rem;
+}
+
+.welcome-icon svg {
+    width: 50px;
+    height: 50px;
+    color: white;
+}
+
+.welcome-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    background: linear-gradient(to right, var(--primary-light), var(--secondary-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.welcome-subtitle {
+    font-size: 1.1rem;
+    max-width: 450px;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+/* Feature Grid */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 650px;
+}
+
+.feature-card {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+    overflow: hidden;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.feature-card:hover::before {
+    opacity: 1;
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 25px -10px rgba(108, 92, 231, 0.5);
+}
+
+.feature-icon svg {
+    color: white;
+    width: 30px;
+    height: 30px;
+}
+
+.feature-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+/* Endpoints Container */
+.endpoints-container {
+    display: grid;
+    gap: 1.5rem;
+}
+
+/* Entity Group */
+.entity-group {
+    animation: fadeIn var(--transition-normal);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
     }
-});
-
-// API code parsing functions
-function parseAPICode(code) {
-    console.log('Parsing API code...');
-    const endpoints = [];
-    let tables = [];
-    
-    // Match routes with various HTTP methods (flexible pattern)
-    const methodPatterns = ['get', 'post', 'put', 'delete'];
-    
-    methodPatterns.forEach(method => {
-        // Flexible regex that captures route definitions regardless of whitespace and formatting
-        const routePattern = new RegExp(`server\\.${method}\\s*\\(\\s*['"]([^'"]+)['"]`, 'gi');
-        let match;
-        
-        while ((match = routePattern.exec(code)) !== null) {
-            const path = match[1];
-            console.log(`Found ${method.toUpperCase()} endpoint: ${path}`);
-            
-            // Extract request body parameters for POST/PUT methods
-            let params = [];
-            if (method === 'post' || method === 'put') {
-                // Look for destructuring patterns in the route handler
-                const handlerStart = code.indexOf(match[0]);
-                const nextOpenBrace = code.indexOf('{', handlerStart);
-                if (nextOpenBrace !== -1) {
-                    const closeBraceIndex = findMatchingBrace(code, nextOpenBrace);
-                    const handlerCode = code.substring(nextOpenBrace, closeBraceIndex + 1);
-                    
-                    // Extract body parameters
-                    const bodyParamsMatch = handlerCode.match(/const\s*{([^}]+)}\s*=\s*req\.body/);
-                    if (bodyParamsMatch) {
-                        params = bodyParamsMatch[1].split(',').map(p => p.trim()).filter(p => p);
-                    }
-                }
-            }
-            
-            // Extract query parameters for GET method
-            let queryParams = [];
-            if (method === 'get') {
-                // Look for destructuring patterns in the route handler
-                const handlerStart = code.indexOf(match[0]);
-                const nextOpenBrace = code.indexOf('{', handlerStart);
-                if (nextOpenBrace !== -1) {
-                    const closeBraceIndex = findMatchingBrace(code, nextOpenBrace);
-                    const handlerCode = code.substring(nextOpenBrace, closeBraceIndex + 1);
-                    
-                    // Extract query parameters
-                    const queryParamsMatch = handlerCode.match(/const\s*{([^}]+)}\s*=\s*req\.query/);
-                    if (queryParamsMatch) {
-                        queryParams = queryParamsMatch[1].split(',').map(p => p.trim()).filter(p => p);
-                    }
-                }
-            }
-            
-            // Extract the resource name from the path
-            // Handle both simple paths ('/users') and parameterized paths ('/users/:id')
-            const pathParts = path.split('/').filter(Boolean);
-            let entityName = '';
-            
-            if (pathParts.length > 0) {
-                // Get the base resource name (e.g., 'users' from '/users/:id')
-                entityName = pathParts[0];
-                
-                // If it's a root path or special case, handle accordingly
-                if (entityName === '' || entityName === 'api') {
-                    entityName = pathParts[1] || '';
-                }
-            }
-
-            let customMessage = '';
-            if (['post', 'put', 'delete'].includes(method)) {
-                const handlerStart = code.indexOf(match[0]);
-                const nextOpenBrace = code.indexOf('{', handlerStart);
-                if (nextOpenBrace !== -1) {
-                    const closeBraceIndex = findMatchingBrace(code, nextOpenBrace);
-                    const handlerCode = code.substring(nextOpenBrace, closeBraceIndex + 1);
-
-                    // return { message: '...' }
-                    const returnMatch = handlerCode.match(/return\s*\{([^}]+)\}/s);
-                    if (returnMatch) {
-                        const returnContent = returnMatch[1];
-                        const messageMatch = returnContent.match(/message\s*:\s*['"`]([^'"`]+)['"`]/);
-                        if (messageMatch) {
-                            customMessage = messageMatch[1];
-                        }
-                    }
-                }
-            }
-            
-            endpoints.push({ 
-                method: method.toUpperCase(), 
-                path,
-                params,
-                queryParams,
-                entityName: entityName,
-                customMessage
-            });
-        }
-    });
-    
-    // Parse table schemas
-    tables = parseSchemaInfo(code);
-    
-    return { endpoints, tables };
-}
-
-// Helper function to find matching closing brace
-function findMatchingBrace(code, openBraceIndex) {
-    let braceCount = 1;
-    let i = openBraceIndex + 1;
-    
-    while (i < code.length && braceCount > 0) {
-        if (code[i] === '{') {
-            braceCount++;
-        } else if (code[i] === '}') {
-            braceCount--;
-        }
-        i++;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    
-    return i - 1;
 }
 
-function parseSchemaInfo(code) {
-    console.log('Parsing schema information...');
-    const tables = [];
-    
-    // Match table creation patterns more flexibly
-    const tablePatternRegex = /createTable\s*\(\s*['"]([^'"]+)['"]/g;
-    let tableMatch;
-    
-    while ((tableMatch = tablePatternRegex.exec(code)) !== null) {
-        const tableName = tableMatch[1];
-        console.log(`Found table: ${tableName}`);
-        
-        // Find the table definition block
-        const tableDefStart = code.indexOf(tableMatch[0]);
-        const startBraceIndex = code.indexOf('{', tableDefStart);
-        
-        if (startBraceIndex !== -1) {
-            // Find the matching closing brace for the table definition
-            const endBraceIndex = findMatchingBrace(code, startBraceIndex);
-            const tableDefCode = code.substring(startBraceIndex, endBraceIndex + 1);
-            
-            // Extract column definitions
-            const columns = [];
-            const columnPattern = /table\.(\w+)\s*\(\s*['"]([^'"]+)['"]?(.*?)(?:(?:\)\s*\.)|(?:\)))/gs;
-            let columnMatch;
-            
-            while ((columnMatch = columnPattern.exec(tableDefCode)) !== null) {
-                const colType = columnMatch[1];
-                const colName = columnMatch[2];
-                const colOptions = columnMatch[3] || '';
-                
-                console.log(`Found column: ${colName} (${colType})`);
-                
-                columns.push({
-                    name: colName,
-                    type: colType,
-                    required: colOptions.includes('notNullable'),
-                    isPrimary: colOptions.includes('primary') || colType.includes('increments'),
-                    isForeign: colOptions.includes('foreign') || colOptions.includes('references'),
-                    reference: colOptions.includes('references') ? 
-                        colOptions.match(/references\s*\(\s*['"]([^'"]+)['"]/)?.[1] : null
-                });
-            }
-            
-            tables.push({
-                name: tableName,
-                columns
-            });
-        }
+.entity-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.entity-title::before {
+    content: '';
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+/* Endpoint Card */
+.endpoint-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+    animation: fadeInUp var(--transition-normal);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    return tables;
-}
-
-// Format code function
-formatButton.addEventListener('click', () => {
-    try {
-        // Get the current code
-        let code = codeEditor.value;
-        
-        // Simple JS formatter
-        try {
-            const jsonObj = JSON.parse(code);
-            code = JSON.stringify(jsonObj, null, 2);
-        } catch (e) {
-            // Not JSON, apply basic formatting
-            code = code
-                .replace(/\s*\{\s*/g, ' {\n  ')
-                .replace(/\s*\}\s*/g, '\n}\n')
-                .replace(/;\s*/g, ';\n')
-                .replace(/\s*,\s*/g, ', ')
-                .replace(/\n\s*\n/g, '\n');
-        }
-        
-        codeEditor.value = code;
-        
-        // Show formatted preview with syntax highlighting
-        previewContainer.classList.add('active');
-        codePreview.textContent = code;
-        
-        if (window.Prism) {
-            Prism.highlightElement(codePreview);
-        }
-        
-        // Automatically hide preview after 3 seconds
-        setTimeout(() => {
-            previewContainer.classList.remove('active');
-        }, 3000);
-        
-    } catch (error) {
-        console.error('Error formatting code:', error);
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-});
+}
 
-// Generate UI from code
-generateButton.addEventListener('click', function() {
-    // Show loading animation
-    loadingOverlay.classList.add('active');
-    
-    // Hide preview if visible
-    previewContainer.classList.remove('active');
-    
-    // Simulate a delay (for visual effect)
-    setTimeout(() => {
-        try {
-            const code = codeEditor.value;
-            const parseResult = parseAPICode(code);
-            const { endpoints, tables } = parseResult;
-            
-            console.log('Parsed endpoints:', endpoints);
-            console.log('Parsed tables:', tables);
-            
-            // Remove the initial welcome state
-            const initialState = document.querySelector('.initial-state');
-            if (initialState) {
-                initialState.remove();
-            }
-            
-            // Clear previous endpoints
-            endpointsContainer.innerHTML = '';
-            
-            if (endpoints.length === 0) {
-                // Display message when no endpoints found
-                showGenerationError('No API endpoints detected in the code. Make sure your code contains server.get(), server.post(), etc.');
-            } else {
-                // Organize endpoints by resource (entity name regardless of method)
-                const endpointsByResource = {};
-                
-                // Group endpoints by resource name
-                endpoints.forEach(endpoint => {
-                    // Skip endpoints with empty entity names
-                    if (!endpoint.entityName) return;
-                    
-                    if (!endpointsByResource[endpoint.entityName]) {
-                        endpointsByResource[endpoint.entityName] = [];
-                    }
-                    endpointsByResource[endpoint.entityName].push(endpoint);
-                });
-                
-                // Create UI for each resource group
-                Object.keys(endpointsByResource).forEach(resource => {
-                    const resourceEndpoints = endpointsByResource[resource];
-                    
-                    const entityGroup = document.createElement('div');
-                    entityGroup.className = 'entity-group fade-in';
-                    
-                    // Create resource title
-                    const entityTitle = document.createElement('h3');
-                    entityTitle.className = 'entity-title';
-                    entityTitle.textContent = capitalizeFirstLetter(resource);
-                    entityGroup.appendChild(entityTitle);
-                    
-                    // Sort endpoints by method (GET, POST, PUT, DELETE in that order)
-                    const methodOrder = { 'GET': 1, 'POST': 2, 'PUT': 3, 'DELETE': 4 };
-                    resourceEndpoints.sort((a, b) => {
-                        return (methodOrder[a.method] || 99) - (methodOrder[b.method] || 99);
-                    });
-                    
-                    // Create endpoint cards for this resource
-                    resourceEndpoints.forEach((endpoint, index) => {
-                        const card = createEndpointCard(endpoint, index, tables);
-                        entityGroup.appendChild(card);
-                    });
-                    
-                    endpointsContainer.appendChild(entityGroup);
-                });
-            }
-            
-            // Generate schema visualization
-            generateSchemaVisualization(tables);
-        } catch (error) {
-            console.error('Error generating UI:', error);
-            showGenerationError('Error generating UI: ' + error.message);
-        } finally {
-            // Hide loading animation
-            loadingOverlay.classList.remove('active');
-        }
-    }, 800);
-});
-    
-// View schema button
-viewSchemaButton.addEventListener('click', () => {
-    const code = codeEditor.value;
-    const { tables } = parseAPICode(code);
-    generateSchemaVisualization(tables);
-    schemaModal.classList.add('visible');
-});
+.endpoint-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
 
-// Create endpoint card 
-function createEndpointCard(endpoint, index, tables) {
-    // Create card element
-    const card = document.createElement('div');
-    card.className = 'endpoint-card fade-in';
-    card.style.animationDelay = `${index * 0.1}s`;
-    
-    // Create card header
-    const header = document.createElement('div');
-    header.className = 'endpoint-header';
-    
-    // Method badge
-    const method = document.createElement('span');
-    method.className = `endpoint-method method-${endpoint.method.toLowerCase()}`;
-    method.textContent = endpoint.method;
-    
-    // Path display
-    const path = document.createElement('span');
-    path.className = 'endpoint-path';
-    path.textContent = endpoint.path;
-    
-    header.appendChild(method);
-    header.appendChild(path);
-    card.appendChild(header);
-    
-    // Create card content
-    const content = document.createElement('div');
-    content.className = 'endpoint-content';
-    
-    // If it's a GET endpoint
-    if (endpoint.method === 'GET') {
-        const form = createQueryForm(endpoint);
-        content.appendChild(form);
+.endpoint-header {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: rgba(15, 23, 42, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.light-theme .endpoint-header {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.endpoint-method {
+    padding: 0.5rem 0.75rem;
+    min-width: 60px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: var(--radius);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.endpoint-method:hover {
+    transform: translateY(-2px);
+    opacity: 1;
+}
+
+.endpoint-method.active {
+    opacity: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.method-get {
+    background-color: rgba(9, 132, 227, 0.15);
+    color: #74b9ff;
+    border: 1px solid rgba(9, 132, 227, 0.3);
+}
+
+.method-post {
+    background-color: rgba(0, 184, 148, 0.15);
+    color: #55efc4;
+    border: 1px solid rgba(0, 184, 148, 0.3);
+}
+
+.method-put {
+    background-color: rgba(253, 203, 110, 0.15);
+    color: #ffeaa7;
+    border: 1px solid rgba(253, 203, 110, 0.3);
+}
+
+.method-delete {
+    background-color: rgba(255, 118, 117, 0.15);
+    color: #fab1a0;
+    border: 1px solid rgba(255, 118, 117, 0.3);
+}
+
+.endpoint-path {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.endpoint-content {
+    padding: 1.25rem;
+}
+
+/* Forms */
+.endpoint-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.form-input {
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    transition: all var(--transition-fast);
+}
+
+select.form-input option {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 0.5rem;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+}
+
+.no-params-message {
+    color: var(--text-tertiary);
+    font-size: 0.875rem;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.endpoint-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.endpoint-result {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: none;
+    outline: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger) 0%, #e84393 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 118, 117, 0.4);
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 118, 117, 0.6);
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: var(--radius-full);
+}
+
+.btn-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+}
+
+/* Loading animations */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1.5rem;
+    z-index: var(--z-modal);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-normal);
+}
+
+.loading-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.light-theme .loading-overlay {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.loader {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.loader-cube1, .loader-cube2 {
+    background-color: var(--primary);
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: sk-cubemove 1.8s infinite ease-in-out;
+    border-radius: var(--radius-sm);
+}
+
+.loader-cube2 {
+    background-color: var(--secondary);
+    animation-delay: -0.9s;
+}
+
+@keyframes sk-cubemove {
+    25% { transform: translateX(42px) rotate(-90deg) scale(0.5); }
+    50% { transform: translateX(42px) translateY(42px) rotate(-180deg); }
+    75% { transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5); }
+    100% { transform: rotate(-360deg); }
+}
+
+.loading-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+    background: linear-gradient(90deg, var(--primary-light) 0%, var(--secondary-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Schema Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: var(--z-modal);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-normal);
+}
+
+.modal.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.light-theme .modal {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    animation: scaleIn var(--transition-normal);
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
     }
-    // If it's a POST or PUT endpoint
-    else if (endpoint.method === 'POST' || endpoint.method === 'PUT') {
-        const form = createSubmitForm(endpoint, tables);
-        content.appendChild(form);
+    to {
+        opacity: 1;
+        transform: scale(1);
     }
-    // If it's a DELETE endpoint
-    else if (endpoint.method === 'DELETE') {
-        const form = createDeleteForm(endpoint);
-        content.appendChild(form);
-    }
-    
-    // Add results container
-    const resultContainer = document.createElement('div');
-    resultContainer.className = 'endpoint-result hidden';
-    resultContainer.innerHTML = '<pre class="result-json"></pre>';
-    content.appendChild(resultContainer);
-    
-    card.appendChild(content);
-    return card;
 }
 
-// Create a form for query parameters (GET endpoints) 
-function createQueryForm(endpoint) {
-    const form = document.createElement('form');
-    form.className = 'endpoint-form query-form';
-    
-    // Add form fields based on query parameters
-    if (endpoint.queryParams && endpoint.queryParams.length > 0) {
-        const formRow = document.createElement('div');
-        formRow.className = 'form-row';
-        
-        endpoint.queryParams.forEach(param => {
-            const formGroup = document.createElement('div');
-            formGroup.className = 'form-group';
-            
-            const label = document.createElement('label');
-            label.className = 'form-label';
-            label.textContent = capitalizeFirstLetter(param);
-            label.htmlFor = `query-${endpoint.path}-${param}`;
-            
-            const input = document.createElement('input');
-            input.className = 'form-input';
-            input.type = 'text';
-            input.name = param;
-            input.id = `query-${endpoint.path}-${param}`;
-            input.placeholder = `Enter ${param}...`;
-            
-            formGroup.appendChild(label);
-            formGroup.appendChild(input);
-            formRow.appendChild(formGroup);
-        });
-        
-        form.appendChild(formRow);
-    } else {
-        // No query params defined
-        const noParams = document.createElement('p');
-        noParams.className = 'no-params-message';
-        noParams.textContent = 'This endpoint has no query parameters.';
-        form.appendChild(noParams);
-    }
-    
-    // Add submit button
-    const actionDiv = document.createElement('div');
-    actionDiv.className = 'endpoint-actions';
-    
-    const submitBtn = document.createElement('button');
-    submitBtn.type = 'submit';
-    submitBtn.className = 'btn btn-primary';
-    submitBtn.innerHTML = `
-        <span>Execute Query</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M13 5L20 12L13 19M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    `;
-    
-    actionDiv.appendChild(submitBtn);
-    form.appendChild(actionDiv);
-    
-    // Add form event listener
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        simulateApiCall(endpoint, form);
-    });
-    
-    return form;
+.modal-header {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-// Create form for POST and PUT endpoints
-function createSubmitForm(endpoint, tables) {
-    const form = document.createElement('form');
-    form.className = 'endpoint-form submit-form';
-    
-    // Find related table schema
-    const relatedTable = tables.find(table => 
-        table.name === endpoint.entityName || 
-        table.name === endpoint.path.split('/')[1]
-    );
-    
-    // Create form fields
-    if (endpoint.params && endpoint.params.length > 0) {
-        endpoint.params.forEach(param => {
-            // Skip id for POST requests
-            if (param === 'id' && endpoint.method === 'POST') return;
-            
-            const formGroup = document.createElement('div');
-            formGroup.className = 'form-group';
-            
-            const label = document.createElement('label');
-            label.className = 'form-label';
-            label.textContent = capitalizeFirstLetter(param);
-            label.htmlFor = `param-${endpoint.path}-${param}`;
-            
-            const input = document.createElement('input');
-            input.className = 'form-input';
-            input.name = param;
-            input.id = `param-${endpoint.path}-${param}`;
-            
-            // Determine input type based on param name or schema
-            let inputType = 'text';
-            
-            if (relatedTable) {
-                const column = relatedTable.columns.find(col => col.name === param);
-                if (column) {
-                    if (column.type === 'integer' || param.endsWith('ID')) {
-                        inputType = 'number';
-                    } else if (column.type === 'date' || param === 'data' || param.includes('date')) {
-                        inputType = 'date';
-                    } else if (param === 'email') {
-                        inputType = 'email';
-                    } else if (param === 'password' || param === 'senha') {
-                        inputType = 'password';
-                    }
-                }
-            } else {
-                // Fallback type detection based on common param names
-                if (param.endsWith('ID') || param === 'id') {
-                    inputType = 'number';
-                } else if (param === 'email') {
-                    inputType = 'email';
-                } else if (param === 'password' || param === 'senha') {
-                    inputType = 'password';
-                } else if (param === 'date' || param === 'data') {
-                    inputType = 'date';
-                }
-            }
-            
-            input.type = inputType;
-            input.placeholder = `Enter ${param}...`;
-            
-            formGroup.appendChild(label);
-            formGroup.appendChild(input);
-            form.appendChild(formGroup);
-        });
-    } else if (relatedTable) {
-        // No params were found in the endpoint, but we have a related table
-        // Create form fields based on table columns
-        relatedTable.columns.forEach(column => {
-            // Skip id for POST requests
-            if ((column.name === 'id' || column.type === 'increments') && endpoint.method === 'POST') return;
-            
-            const formGroup = document.createElement('div');
-            formGroup.className = 'form-group';
-            
-            const label = document.createElement('label');
-            label.className = 'form-label';
-            label.textContent = capitalizeFirstLetter(column.name);
-            label.htmlFor = `param-${endpoint.path}-${column.name}`;
-            
-            const input = document.createElement('input');
-            input.className = 'form-input';
-            input.name = column.name;
-            input.id = `param-${endpoint.path}-${column.name}`;
-            
-            // Determine input type based on column type
-            let inputType = 'text';
-            
-            if (column.type === 'integer' || column.name.endsWith('ID')) {
-                inputType = 'number';
-            } else if (column.type === 'date' || column.name === 'data') {
-                inputType = 'date';
-            } else if (column.name === 'email') {
-                inputType = 'email';
-            } else if (column.name === 'password' || column.name === 'senha') {
-                inputType = 'password';
-            }
-            
-            input.type = inputType;
-            input.placeholder = `Enter ${column.name}...`;
-            
-            formGroup.appendChild(label);
-            formGroup.appendChild(input);
-            form.appendChild(formGroup);
-        });
-    } else {
-        // No params or related table found
-        const noParams = document.createElement('p');
-        noParams.className = 'no-params-message';
-        noParams.textContent = 'Could not determine parameters for this endpoint.';
-        form.appendChild(noParams);
-    }
-    
-    // Add submit button
-    const actionDiv = document.createElement('div');
-    actionDiv.className = 'endpoint-actions';
-    
-    const submitBtn = document.createElement('button');
-    submitBtn.type = 'submit';
-    submitBtn.className = 'btn btn-primary';
-    submitBtn.innerHTML = endpoint.method === 'POST' ? 
-        `<span>Create</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 4V20M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>` : 
-        `<span>Update</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>`;
-    
-    actionDiv.appendChild(submitBtn);
-    form.appendChild(actionDiv);
-    
-    // Add form event listener
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        simulateApiCall(endpoint, form);
-    });
-    
-    return form;
+.modal-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    background: linear-gradient(90deg, var(--primary-light) 0%, var(--secondary-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-// Create form for DELETE endpoints
-function createDeleteForm(endpoint) {
-    const form = document.createElement('form');
-    form.className = 'endpoint-form delete-form';
-    
-    // Typically DELETE endpoints only need an ID
-    const formGroup = document.createElement('div');
-    formGroup.className = 'form-group';
-    
-    const idParam = endpoint.path.includes(':id') ? 'id' : 'ID';
-    
-    const label = document.createElement('label');
-    label.className = 'form-label';
-    label.textContent = `${capitalizeFirstLetter(idParam)} to Delete`;
-    label.htmlFor = `delete-${endpoint.path}-id`;
-    
-    const input = document.createElement('input');
-    input.className = 'form-input';
-    input.type = 'number';
-    input.name = idParam;
-    input.id = `delete-${endpoint.path}-id`;
-    input.placeholder = `Enter ${idParam}...`;
-    input.required = true;
-    
-    formGroup.appendChild(label);
-    formGroup.appendChild(input);
-    form.appendChild(formGroup);
-    
-    // Add warning message
-    const warning = document.createElement('div');
-    warning.className = 'delete-warning';
-    warning.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 9V11M12 15H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0377 2.66667 10.2679 4L3.33975 16C2.56998 17.3333 3.53223 19 5.07183 19Z" 
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span>This action cannot be undone. Be careful!</span>
-    `;
-    form.appendChild(warning);
-    
-    // Add submit button
-    const actionDiv = document.createElement('div');
-    actionDiv.className = 'endpoint-actions';
-    
-    const submitBtn = document.createElement('button');
-    submitBtn.type = 'submit';
-    submitBtn.className = 'btn btn-danger';
-    submitBtn.innerHTML = `
-        <span>Delete</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 7L18.1327 19.1425C18.0579 20.1891 17.187 21 16.1378 21H7.86224C6.81296 21 5.94208 20.1891 5.86732 19.1425L5 7M10 11V17M14 11V17M15 7V4C15 3.44772 14.5523 3 14 3H10C9.44772 3 9 3.44772 9 4V7M4 7H20" 
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    `;
-    
-    actionDiv.appendChild(submitBtn);
-    form.appendChild(actionDiv);
-    
-    // Add form event listener
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        simulateApiCall(endpoint, form);
-    });
-    
-    return form;
+.modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
 }
 
-// Simulate an API call
-function simulateApiCall(endpoint, form) {
-    const formData = new FormData(form);
-    const data = {};
-    
-    for (let [key, value] of formData.entries()) {
-        data[key] = value;
-    }
-    
-    const resultContainer = form.nextElementSibling;
-    const resultJson = resultContainer.querySelector('.result-json');
-    
-    // Add loading state to button
-    const submitButton = form.querySelector('button[type="submit"]');
-    const originalHTML = submitButton.innerHTML;
-    submitButton.disabled = true;
-    submitButton.innerHTML = `
-        <svg class="spinner-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2V6M12 18V22M4 12H2M6.31412 6.31412L3.5 3.5M17.6859 6.31412L20.5 3.5M6.31412 17.6859L3.5 20.5M17.6859 17.6859L20.5 20.5M22 12H20" 
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span>Processing...</span>
-    `;
-    
-    // Simulate network delay
-    setTimeout(() => {
-        let mockResponse;
-        
-        switch (endpoint.method) {
-            case 'GET':
-                // For GET, return a list of items or filtered results
-                mockResponse = generateMockGetResponse(endpoint, data);
-                break;
-            case 'POST':
-                // For POST, return created item with ID
-                mockResponse = {
-                    message: endpoint.customMessage || `${endpoint.entityName} created successfully`,
-                    id: Math.floor(Math.random() * 1000) + 1,
-                    ...data,
-                    timestamp: new Date().toISOString()
-                };
-                break;
-            case 'PUT':
-                // For PUT, return success message
-                mockResponse = {
-                    message: endpoint.customMessage || `${endpoint.entityName} with ID ${data.id} updated successfully`,
-                    ...data,
-                    updatedAt: new Date().toISOString()
-                };
-                break;
-            case 'DELETE':
-                // For DELETE, return success message
-                mockResponse = {
-                    message: endpoint.customMessage ||`${endpoint.entityName} with ID ${data.id || data.ID} deleted successfully`,
-                    deletedAt: new Date().toISOString()
-                };
-                break;
-        }
-        
-        // Display the mock response
-        resultContainer.classList.remove('hidden');
-        resultJson.textContent = JSON.stringify(mockResponse, null, 2);
-        
-        // Reset button state
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalHTML;
-        
-        // Highlight the result
-        if (window.Prism) {
-            Prism.highlightElement(resultJson);
-        }
-        
-    }, 800);
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+    transform: rotate(90deg);
 }
 
-// Generate mock GET response based on entity and filters
-function generateMockGetResponse(endpoint, filters) {
-    const entityName = endpoint.entityName;
-    const count = Math.floor(Math.random() * 5) + 1;
-    const results = [];
-    
-    for (let i = 0; i < count; i++) {
-        const item = {
-            id: Math.floor(Math.random() * 1000) + 1
-        };
-
-            // Generic entity
-        Object.keys(filters).forEach(key => {
-            if (filters[key]) {
-                item[key] = filters[key];
-            } else {
-                item[key] = `Value ${i + 1} for ${key}`;
-            }
-        });
-        
-        // Add some default values for empty queries
-        if (Object.keys(item).length <= 1) {
-            item.name = `${entityName.slice(0, -1)} ${item.id}`;
-            item.createdAt = new Date().toISOString();
-        }
-        
-        
-        results.push(item);
-    }
-    
-    return results;
+.modal-body {
+    padding: 1.5rem;
+    overflow: auto;
 }
 
-// Generate schema visualization for modal
-function generateSchemaVisualization(tables) {
-    if (!tables || tables.length === 0) {
-        schemaContent.innerHTML = '<p>No database schema found in the code.</p>';
-        return;
-    }
-    
-    const schemaContainer = document.createElement('div');
-    schemaContainer.className = 'schema-container';
-    
-    tables.forEach(table => {
-        const tableEl = document.createElement('div');
-        tableEl.className = 'schema-table';
-        
-        const header = document.createElement('div');
-        header.className = 'schema-table-header';
-        header.textContent = table.name;
-        
-        const body = document.createElement('div');
-        body.className = 'schema-table-body';
-        
-        table.columns.forEach(column => {
-            const columnEl = document.createElement('div');
-            columnEl.className = 'schema-column';
-            
-            const nameEl = document.createElement('div');
-            nameEl.className = 'column-name';
-            nameEl.textContent = column.name;
-            
-            // If it's a primary key or foreign key, add an icon
-            if (column.isPrimary) {
-                nameEl.innerHTML = `
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 4px;">
-                        <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L9 19H6v3H3v-3.986L9.257 14.7A6 6 0 1121 9z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    ${column.name}
-                `;
-            } else if (column.isForeign) {
-                nameEl.innerHTML = `
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 4px;">
-                        <path d="M9 4H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2h-2M9 4V3a2 2 0 012-2h2a2 2 0 012 2v1M9 4h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                    ${column.name}
-                `;
-            }
-            
-            const typeEl = document.createElement('div');
-            typeEl.className = 'column-type';
-            typeEl.textContent = column.type;
-            
-            columnEl.appendChild(nameEl);
-            columnEl.appendChild(typeEl);
-            body.appendChild(columnEl);
-        });
-        
-        tableEl.appendChild(header);
-        tableEl.appendChild(body);
-        schemaContainer.appendChild(tableEl);
-    });
-    
-    schemaContent.innerHTML = '';
-    schemaContent.appendChild(schemaContainer);
+/* Schema visualization */
+.schema-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
 }
 
-// Show error message
-function showGenerationError(message) {
-    endpointsContainer.innerHTML = `
-        <div class="welcome-message">
-            <div class="welcome-icon">
-                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 9V13M12 17H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0377 2.66667 10.2679 4L3.33975 16C2.56998 17.3333 3.53223 19 5.07183 19Z" 
-                          stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <h2 class="welcome-title">Error</h2>
-            <p class="welcome-subtitle">${message}</p>
-        </div>
-    `;
+.schema-table {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    animation: fadeIn var(--transition-normal);
 }
 
-// Utility function to capitalize first letter
-function capitalizeFirstLetter(string) {
-    if (!string) return '';
-    return string.charAt(0).toUpperCase() + string.slice(1);
+.schema-table-header {
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-// Initialize with code highlighting
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.Prism) {
-        Prism.highlightAll();
-    }
-    
-    // Load and initialize the Fastify Generator script
-    loadFastifyGeneratorScript();
-});
-
-function getDatabaseConfig() {
-    return {
-        user: document.getElementById('db-user')?.value || 'root',
-        password: document.getElementById('db-password')?.value || '',
-        database: document.getElementById('db-name')?.value || 'skibidi'
-    };
+.schema-table-body {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
 }
 
-// Load the Fastify Generator script
-function loadFastifyGeneratorScript() {
-    const script = document.createElement('script');
-    script.src = 'projetoGenerator.js';
-    script.onload = () => {
-        console.log('Fastify Generator script loaded');
-        
-        // Reference the DOM elements
-        const tablesContainer = document.getElementById('tables-container');
-        const addTableBtn = document.getElementById('add-table-btn');
-        const jsonOutput = document.getElementById('json-output');
-        const downloadBtn = document.getElementById('download-btn');
-        
-        // Initialize table counter
-        let tableCounter = 0;
-        
-        // Add table event
-        addTableBtn.addEventListener('click', () => addNewTable());
-        
-        // Add a new table to the generator
-        function addNewTable() {
-            const tableId = Date.now();
-            tableCounter++;
-            
-            // Create table form
-            const tableForm = document.createElement('div');
-            tableForm.className = 'glass-card';
-            tableForm.style.padding = '1.25rem';
-            tableForm.style.marginBottom = '1.5rem';
-            tableForm.setAttribute('data-table-id', tableId);
-            
-            tableForm.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-                            <path d="M3 9H21" stroke="currentColor" stroke-width="2"/>
-                            <path d="M9 9V21" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                        <h3>Table Configuration</h3>
-                    </div>
-                    <button class="btn btn-danger btn-sm remove-table" data-table-id="${tableId}">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M19 7L18.1327 19.1425C18.0579 20.1891 17.187 21 16.1378 21H7.86224C6.81296 21 5.94208 20.1891 5.86732 19.1425L5 7M10 11V17M14 11V17M15 7V4C15 3.44772 14.5523 3 14 3H10C9.44772 3 9 3.44772 9 4V7M4 7H20" 
-                                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        Remove
-                    </button>
-                </div>
-                
-                <div style="margin-bottom: 1rem;">
-                    <div class="form-group">
-                        <label class="form-label">Table Name</label>
-                        <input type="text" class="form-input table-name" placeholder="Enter table name (e.g., users, products)" required>
-                    </div>
-                </div>
+.schema-column {
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
 
-                <h4 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 9H21M8 3V21M18 15L15 18M18 15L21 18M18 15V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Columns
-                </h4>
-                <div class="columns-list" data-table-id="${tableId}">
-                    <!-- Columns will be added here -->
-                </div>
+.schema-column:last-child {
+    border-bottom: none;
+}
 
-                <div style="margin-top: 1rem;">
-                    <button class="btn btn-secondary btn-sm add-column" data-table-id="${tableId}">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                        Add Column
-                    </button>
-                </div>
-            `;
-            
-            // Add the table form to the container
-            tablesContainer.appendChild(tableForm);
-            
-            // Add event listener to the "Add Column" button
-            const addColumnBtn = tableForm.querySelector('.add-column');
-            addColumnBtn.addEventListener('click', () => addNewColumn(tableId));
-            
-            // Add event listener to the "Remove Table" button
-            const removeTableBtn = tableForm.querySelector('.remove-table');
-            removeTableBtn.addEventListener('click', () => removeTable(tableId));
-            
-            
-            // Add an initial column
-            addNewColumn(tableId);
-            
-            // Update the JSON output
-            updateJsonOutput();
-        }
+.column-name {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
 
-        function updateJsonOutput() {
-            const output = [];
+.column-name .key-icon {
+    color: var(--secondary-light);
+    font-size: 0.75rem;
+}
 
-            document.querySelectorAll('.glass-card[data-table-id]').forEach(tableForm => {
-            const tableName = tableForm.querySelector('.table-name')?.value.trim();
-            if (!tableName) return;
+.column-type {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+}
 
-            const tableObj = { Tabela: tableName };
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
 
-            tableForm.querySelectorAll('[data-column-id]').forEach(column => {
-                const columnName = column.querySelector('.column-name')?.value.trim();
-                const columnType = column.querySelector('.column-type')?.value;
-                const properties = [];
+.fade-in {
+    animation: fadeIn var(--transition-normal);
+}
 
-                if (!columnName || !columnType) return;
-
-                if (column.querySelector('.prop-primary')?.checked) properties.push("primary");
-                if (column.querySelector('.prop-increments')?.checked) properties.push("increments");
-                if (column.querySelector('.prop-notNullable')?.checked) properties.push("notNullable");
-                if (column.querySelector('.prop-show')?.checked) properties.push("show");
-                if (column.querySelector('.prop-foreign')?.checked) {
-                const foreignRef = column.querySelector('.foreign-ref')?.value.trim();
-                if (foreignRef) {
-                    properties.push(`foreign.${foreignRef}`);
-                } else {
-                    properties.push("foreign");
-                }
-                }
-
-                properties.push(columnType);
-                tableObj[columnName] = properties;
-            });
-
-            output.push(tableObj);
-            });
-
-            const jsonOutput = document.getElementById('json-output');
-            if (jsonOutput) {
-            jsonOutput.textContent = JSON.stringify(output, null, 2);
-            }
-        }
-        
-        // Add a new column to a table
-        function addNewColumn(tableId) {
-            const columnId = Date.now();
-            const columnsContainer = document.querySelector(`.columns-list[data-table-id="${tableId}"]`);
-
-            const columnDiv = document.createElement('div');
-            columnDiv.className = 'glass-card';
-            columnDiv.style.padding = '1rem';
-            columnDiv.style.marginBottom = '1rem';
-            columnDiv.setAttribute('data-column-id', columnId);
-            
-            columnDiv.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 6H20M9 12H20M9 18H20M5 6V6.01M5 12V12.01M5 18V18.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                        Column Details
-                    </div>
-                    <button class="btn btn-danger btn-sm remove-column" data-column-id="${columnId}">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Column Name</label>
-                        <input type="text" class="form-input column-name" placeholder="Enter column name" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Data Type</label>
-                        <select class="form-input column-type">
-                            <option value="integer">Integer</option>
-                            <option value="string">String</option>
-                            <option value="text">Text</option>
-                            <option value="date">Date</option>
-                            <option value="boolean">Boolean</option>
-                            <option value="decimal">Decimal</option>
-                            <option value="json">JSON</option>
-                            <option value="time">Time</option>
-                            <option value="timestamp">Timestamp</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; margin-top: 1rem;">
-                    <div class="property-checkbox" style="background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="primary-${columnId}" class="prop-primary">
-                        <label for="primary-${columnId}" style="margin: 0; font-size: 0.875rem;">Primary Key</label>
-                    </div>
-                    <div class="property-checkbox" style="background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="increments-${columnId}" class="prop-increments">
-                        <label for="increments-${columnId}" style="margin: 0; font-size: 0.875rem;">Auto Increment</label>
-                    </div>
-                    <div class="property-checkbox" style="background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="notNull-${columnId}" class="prop-notNullable">
-                        <label for="notNull-${columnId}" style="margin: 0; font-size: 0.875rem;">Not Nullable</label>
-                    </div>
-                    <div class="property-checkbox" style="background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="show-${columnId}" class="prop-show">
-                        <label for="show-${columnId}" style="margin: 0; font-size: 0.875rem;">Display in UI</label>
-                    </div>
-                    <div class="property-checkbox" style="background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="foreign-${columnId}" class="prop-foreign foreign-toggle">
-                        <label for="foreign-${columnId}" style="margin: 0; font-size: 0.875rem;">Foreign Key</label>
-                    </div>
-                </div>
-                
-                <div class="foreign-key-group hidden" style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.08);">
-                    <div class="form-group">
-                        <label>Referenced Columns (comma separated)</label>
-                        <input type="text" class="form-input foreign-ref" placeholder="e.g., email.name">
-                        <div style="font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.25rem;">Format: columnName or columnName.displayColumn</div>
-                    </div>
-                </div>
-            `;
-            
-            columnsContainer.appendChild(columnDiv);
-
-            const removeColumnBtn = columnDiv.querySelector('.remove-column');
-            removeColumnBtn.addEventListener('click', () => {
-            columnDiv.remove();
-            updateJsonOutput();
-            });
-
-            const foreignToggle = columnDiv.querySelector('.foreign-toggle');
-            const foreignKeyGroup = columnDiv.querySelector('.foreign-key-group');
-            foreignToggle.addEventListener('change', () => {
-            if (foreignToggle.checked) {
-                foreignKeyGroup.classList.remove('hidden');
-            } else {
-                foreignKeyGroup.classList.add('hidden');
-            }
-            updateJsonOutput();
-            });
-
-            // Add event listeners for updating the JSON output
-            const inputs = columnDiv.querySelectorAll('input, select');
-            inputs.forEach(input => {
-            input.addEventListener('change', updateJsonOutput);
-            input.addEventListener('input', updateJsonOutput);
-            });
-
-            const foreignRefInput = columnDiv.querySelector('.foreign-ref');
-            if (foreignRefInput) {
-            foreignRefInput.addEventListener('input', updateJsonOutput);
-            }
-
-            updateJsonOutput();
-        }
-        
-        // Remove a table
-        function removeTable(tableId) {
-            const tableForm = document.querySelector(`[data-table-id="${tableId}"]`);
-            if (tableForm) {
-                tableForm.remove();
-                updateJsonOutput();
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('[data-column-id]').forEach(column => {
-            const inputs = column.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                input.addEventListener('input', updateJsonOutput);
-                input.addEventListener('change', updateJsonOutput);
-            });
-
-            const foreignRefInput = column.querySelector('.foreign-ref');
-            if (foreignRefInput) {
-                foreignRefInput.addEventListener('input', updateJsonOutput);
-            }
-            });
-            updateJsonOutput();
-        });
-        
-        // Handle download button
-        downloadBtn.addEventListener('click', () => {
-            try {
-                const jsonConfig = JSON.parse(document.getElementById('json-output').textContent);
-                const dbConfig = getDatabaseConfig();
-                const code = gerarProjetoCompleto(jsonConfig, dbConfig);
-                const blob = new Blob([code], { type: 'application/javascript' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'appGerated.js';
-                link.click();
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                console.error('Failed to generate code:', error);
-                alert('Error generating code: ' + error.message);
-            }
-            });
-        
-        // Generate project code from the JSON config
-        function generateProjectCode() {
-            const jsonConfig = JSON.parse(jsonOutput.textContent);
-            const code = generateCodeFromJson(jsonConfig);
-            return code;
-        }
+/* Media Queries */
+@media (max-width: 1200px) {
+    .dashboard {
+        grid-template-columns: 1fr;
     }
     
-    document.body.appendChild(script);
+    .editor-panel, 
+    .result-panel {
+        grid-column: span 12;
+        height: auto;
+        min-height: 400px;
+    }
+
+    .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Fastify Generator workspace adjustments */
+    .fg-workspace {
+        height: auto;
+        min-height: 600px;
+    }
+    
+    .fg-left-panel, .fg-right-panel {
+        height: auto;
+        min-height: 400px;
+    }
 }
 
-const dbToggleBtn = document.getElementById('toggle-db-config-btn');
-const dbConfigBody = document.getElementById('db-config-body');
-
-if (dbToggleBtn && dbConfigBody) {
-    dbToggleBtn.addEventListener('click', () => {
-        const isVisible = dbConfigBody.style.display !== 'none';
-        dbConfigBody.style.display = isVisible ? 'none' : 'block';
-        dbToggleBtn.innerHTML = isVisible
-            ? `<span>Expand</span> <i class="fas fa-chevron-down"></i>`
-            : `<span>Minimize</span> <i class="fas fa-chevron-up"></i>`;
-    });
+@media (max-width: 768px) {
+    /* Header adjustments */
+    header {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    /* App switcher for mobile */
+    .app-switcher {
+        width: 100%;
+    }
+    
+    .app-switch-btn {
+        padding: 0.8rem 1rem;
+        flex: 1;
+        font-size: 1rem;
+    }
+    
+    /* Content area adjustments */
+    .main-content {
+        padding: 0 1rem 1rem;
+    }
+    
+    .dashboard {
+        height: auto;
+        gap: 1rem;
+    }
+    
+    /* Panels */
+    .panel-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .panel-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    /* Welcome section */
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .welcome-title {
+        font-size: 1.5rem;
+    }
+    
+    .welcome-subtitle {
+        font-size: 0.95rem;
+    }
+    
+    .welcome-icon {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .welcome-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* Form elements */
+    .form-group {
+        min-width: 100%;
+    }
+    
+    .form-input, 
+    select.form-input, 
+    .btn {
+        padding: 0.9rem 1rem;
+        font-size: 1rem;
+    }
+    
+    /* Fastify Generator adjustments */
+    .fg-workspace {
+        gap: 1rem;
+    }
+    
+    .fg-output-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
 }
 
-const togglePasswordBtn = document.getElementById('toggle-password');
-const passwordInput = document.getElementById('db-password');
-const eyeIcon = document.getElementById('eye-icon');
-
-if (togglePasswordBtn && passwordInput && eyeIcon) {
-    togglePasswordBtn.addEventListener('click', () => {
-        const isHidden = passwordInput.type === 'password';
-        passwordInput.type = isHidden ? 'text' : 'password';
-        togglePasswordBtn.title = isHidden ? 'Hide Password' : 'Show Password';
-
-        // Show and hide
-        eyeIcon.innerHTML = isHidden
-            ? `
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19
-                    c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.224-3.592M6.18 6.18A9.96 9.96 0 0112 5
-                    c4.477 0 8.268 2.943 9.542 7a9.958 9.958 0 01-4.199 5.818M15 12a3 3 0 11-6 0 3 3 0 016 0zM3 3l18 18"/>
-            `
-            : `
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5
-                    c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-            `;
-    });
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .theme-toggle {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .endpoint-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .endpoint-path {
+        width: 100%;
+        word-break: break-all;
+    }
+    
+    .code-textarea {
+        font-size: 0.85rem;
+        padding: 1rem;
+    }
+    
+    .modal-content {
+        width: 95%;
+        max-height: 95vh;
+    }
+    
+    .endpoint-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    
+    .endpoint-actions .btn {
+        width: 100%;
+    }
 }
 
+/* App Views */
+.app-view {
+    display: none;
+    height: 100%;
+}
 
-// Error handling for script loading
-window.onerror = function(message, source, lineno, colno, error) {
-    console.error('Script error:', message, source, lineno);
-    return true;
-};
+.app-view.active {
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn var(--transition-normal);
+}
+
+/* Fastify Generator (Preview) */
+.fg-workspace {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.5rem;
+    height: calc(100vh - 12rem);
+    min-height: 600px;
+}
+
+.fg-left-panel {
+    grid-column: span 8;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 107%;
+}
+
+.fg-right-panel {
+    grid-column: span 4;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 107%;
+}
+
+.fg-tables-container {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.fg-output-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(30, 41, 59, 0.7) 100%);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fg-output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fg-output-header h2 {
+    font-size: 1.25rem;
+    color: var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.fg-output-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem;
+}
+
+.fg-json-output {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--gray-200);
+    white-space: pre-wrap;
+}
+
+@media (max-width: 1200px) {
+    .fg-workspace {
+        grid-template-columns: 1fr;
+    }
+    
+    .fg-left-panel, 
+    .fg-right-panel {
+        grid-column: span 12;
+    }
+    
+    .fg-right-panel {
+        min-height: 300px;
+        margin-top: 1rem;
+    }
+}
+
+/* Tour customization */
+.introjs-tooltip {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    max-width: 350px;
+}
+
+.introjs-tooltiptext {
+    padding: 15px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.introjs-helperLayer {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid var(--primary) !important;
+    box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.6) !important;
+    border-radius: var(--radius);
+}
+
+.introjs-button {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-sm) !important;
+    font-family: var(--font-sans) !important;
+    font-size: 0.85rem !important;
+    padding: 7px 15px !important;
+    text-shadow: none !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+    margin: 5px !important;
+}
+
+.introjs-button:hover, .introjs-button:focus, .introjs-button:active {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.introjs-button.introjs-nextbutton {
+    background-color: var(--primary) !important;
+    color: white !important;
+    border-color: var(--primary-dark) !important;
+}
+
+.introjs-button.introjs-nextbutton:hover {
+    background-color: var(--primary-dark) !important;
+}
+
+.introjs-bullets ul li a {
+    background-color: var(--bg-tertiary) !important;
+    width: 8px !important;
+    height: 8px !important;
+}
+
+.introjs-bullets ul li a.active {
+    background-color: var(--primary) !important;
+}
+
+.introjs-arrow {
+    border-color: var(--bg-card) !important;
+}
+
+.introjs-skipbutton {
+    color: var(--text-tertiary) !important;
+    font-size: 0.8rem !important;
+    padding: 2px 8px !important;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
