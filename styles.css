@@ -1134,15 +1134,39 @@ select.form-input option {
     .feature-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+    
+    /* Fastify Generator workspace adjustments */
+    .fg-workspace {
+        height: auto;
+        min-height: 600px;
+    }
+    
+    .fg-left-panel, .fg-right-panel {
+        height: auto;
+        min-height: 400px;
+    }
 }
 
 @media (max-width: 768px) {
+    /* Header adjustments */
     header {
         padding: 1rem;
         flex-direction: column;
         gap: 1rem;
     }
     
+    /* App switcher for mobile */
+    .app-switcher {
+        width: 100%;
+    }
+    
+    .app-switch-btn {
+        padding: 0.8rem 1rem;
+        flex: 1;
+        font-size: 1rem;
+    }
+    
+    /* Content area adjustments */
     .main-content {
         padding: 0 1rem 1rem;
     }
@@ -1152,12 +1176,29 @@ select.form-input option {
         gap: 1rem;
     }
     
+    /* Panels */
+    .panel-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .panel-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    /* Welcome section */
     .feature-grid {
         grid-template-columns: 1fr;
     }
     
     .welcome-title {
         font-size: 1.5rem;
+    }
+    
+    .welcome-subtitle {
+        font-size: 0.95rem;
     }
     
     .welcome-icon {
@@ -1168,6 +1209,68 @@ select.form-input option {
     .welcome-icon svg {
         width: 40px;
         height: 40px;
+    }
+    
+    /* Form elements */
+    .form-group {
+        min-width: 100%;
+    }
+    
+    .form-input, 
+    select.form-input, 
+    .btn {
+        padding: 0.9rem 1rem;
+        font-size: 1rem;
+    }
+    
+    /* Fastify Generator adjustments */
+    .fg-workspace {
+        gap: 1rem;
+    }
+    
+    .fg-output-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .theme-toggle {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .endpoint-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .endpoint-path {
+        width: 100%;
+        word-break: break-all;
+    }
+    
+    .code-textarea {
+        font-size: 0.85rem;
+        padding: 1rem;
+    }
+    
+    .modal-content {
+        width: 95%;
+        max-height: 95vh;
+    }
+    
+    .endpoint-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    
+    .endpoint-actions .btn {
+        width: 100%;
     }
 }
 
@@ -1266,6 +1369,7 @@ select.form-input option {
     
     .fg-right-panel {
         min-height: 300px;
+        margin-top: 1rem;
     }
 }
 
