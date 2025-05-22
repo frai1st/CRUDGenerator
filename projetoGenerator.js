@@ -3,7 +3,7 @@ const fs = require('fs')
 // Template
 const templates = []
 
-// leitor de template
+// Generate tables based on template
 function generateColumnCode(columnName, properties) {
     let code = "table"
     const type = properties.find(p => ["string", "date", "integer", "boolean", "text", "increments"].includes(p))
@@ -33,7 +33,7 @@ function gerarCodigoKnex(template) {
     "            " + generateColumnCode(nome, props)
   ).join("\n")
 
-  // mais FOREIGN KEYS
+  // FOREIGN KEYS
   const foreignConstraints = colunas
     .filter(([_, props]) => props.some(p => p.startsWith("foreign")))
     .map(([nome, props]) => {
@@ -57,6 +57,7 @@ function gerarCodigoKnex(template) {
 ${nomeFuncao}()`
 }
 
+// Generate endpoints based on template
 function gerarEndpointsFastify(template) {
   const nomeTabela = template["Tabela"]
   const colunas = Object.entries(template).filter(([key]) => key !== "Tabela")
@@ -69,7 +70,7 @@ function gerarEndpointsFastify(template) {
     .map(([nome, props]) => {
     const foreignAttr = props.find(p => p.startsWith("foreign."))
     const partes = foreignAttr.split('.')
-    const atributos = partes.slice(1) // tudo depois de "foreign."
+    const atributos = partes.slice(1) // consider everything after "foreign."
     const tabelaRef = nome.replace(/ID$/i, '').toLowerCase() + 's'
     return { nome, tabelaRef, atributos }
   })
@@ -132,7 +133,10 @@ function gerarEndpointsFastify(template) {
   })`
 }
 
-function gerarProjetoCompleto(templates) {
+// Generate the complete project
+function gerarProjetoCompleto(templates, dbConfig = { user: 'root', password: '', database: '' }) {
+  const { user, password, database } = dbConfig;
+
   const codigoTabelas = templates.map(t => gerarCodigoKnex(t)).join("\n\n")
   const codigoEndpoints = templates.map(t => gerarEndpointsFastify(t)).join("\n\n")
 
@@ -142,9 +146,9 @@ const knex = require('knex')({
     connection: {
         host: '127.0.0.1',
         port: 3306,
-        user: 'root',
-        password: '',
-        database: 'skibidi'
+        user: '${user}',
+        password: '${password}',
+        database: '${database}'
     }
 })
 const server = fastify()
@@ -162,7 +166,7 @@ server.listen({ port: 3000 }, (err, address) => {
 })`
 }
 
-// arquivo final
+// Create final file
 const codigoFinal = gerarProjetoCompleto(templates)
 fs.writeFileSync('appGerated.js', codigoFinal)
 console.log('gerado appGerated.js')
