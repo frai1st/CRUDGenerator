@@ -168,6 +168,50 @@
             <div id="fastify-generator-view" class="app-view">
                 <div class="fg-workspace">
                     <div class="fg-left-panel glass-card" data-intro="Build your database schema by adding tables and columns" data-step="6">
+                        <div class="glass-card" id="db-config-card" style="margin-bottom: 1rem; padding: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" id="db-config-toggle">
+                                <h3 style="margin: 0;">Database Configuration</h3>
+                                <button class="btn btn-secondary btn-sm" id="toggle-db-config-btn">
+                                    <span>Minimize</span>
+                                    <i class="fas fa-chevron-up"></i>
+                                </button>
+                            </div>
+                            <div id="db-config-body" style="margin-top: 1rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Database Name</label>
+                                    <input id="db-name" type="text" class="form-input" placeholder="e.g., my_database">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">User</label>
+                                    <input id="db-user" type="text" class="form-input" placeholder="e.g., root">
+                                </div>
+                                <div class="form-group" style="position: relative;">
+                                    <label class="form-label">Password</label>
+                                    <input id="db-password" type="password" class="form-input" placeholder="••••••••">
+                                    <button type="button" class="icon-btn" id="toggle-password" style="
+                                        position: absolute;
+                                        top: 55%;
+                                        right: 0.75rem;
+                                        background: none;
+                                        border: none;
+                                        cursor: pointer;
+                                        padding: 0;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                    " title="Show Password">
+                                        <!-- Eye icon -->
+                                        <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                    </button>
+
+                                </div>
+                            </div>
+                        </div>
                         <div class="panel-header">
                             <div class="panel-title">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
