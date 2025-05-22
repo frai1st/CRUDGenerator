@@ -1002,6 +1002,14 @@ document.addEventListener('DOMContentLoaded', () => {
     loadFastifyGeneratorScript();
 });
 
+function getDatabaseConfig() {
+    return {
+        user: document.getElementById('db-user')?.value || 'root',
+        password: document.getElementById('db-password')?.value || '',
+        database: document.getElementById('db-name')?.value || 'skibidi'
+    };
+}
+
 // Load the Fastify Generator script
 function loadFastifyGeneratorScript() {
     const script = document.createElement('script');
@@ -1282,7 +1290,8 @@ function loadFastifyGeneratorScript() {
         downloadBtn.addEventListener('click', () => {
             try {
                 const jsonConfig = JSON.parse(document.getElementById('json-output').textContent);
-                const code = gerarProjetoCompleto(jsonConfig);
+                const dbConfig = getDatabaseConfig();
+                const code = gerarProjetoCompleto(jsonConfig, dbConfig);
                 const blob = new Blob([code], { type: 'application/javascript' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -1306,6 +1315,45 @@ function loadFastifyGeneratorScript() {
     
     document.body.appendChild(script);
 }
+
+const dbToggleBtn = document.getElementById('toggle-db-config-btn');
+const dbConfigBody = document.getElementById('db-config-body');
+
+if (dbToggleBtn && dbConfigBody) {
+    dbToggleBtn.addEventListener('click', () => {
+        const isVisible = dbConfigBody.style.display !== 'none';
+        dbConfigBody.style.display = isVisible ? 'none' : 'block';
+        dbToggleBtn.innerHTML = isVisible
+            ? `<span>Expand</span> <i class="fas fa-chevron-down"></i>`
+            : `<span>Minimize</span> <i class="fas fa-chevron-up"></i>`;
+    });
+}
+
+const togglePasswordBtn = document.getElementById('toggle-password');
+const passwordInput = document.getElementById('db-password');
+const eyeIcon = document.getElementById('eye-icon');
+
+if (togglePasswordBtn && passwordInput && eyeIcon) {
+    togglePasswordBtn.addEventListener('click', () => {
+        const isHidden = passwordInput.type === 'password';
+        passwordInput.type = isHidden ? 'text' : 'password';
+        togglePasswordBtn.title = isHidden ? 'Hide Password' : 'Show Password';
+
+        // Show and hide
+        eyeIcon.innerHTML = isHidden
+            ? `
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19
+                    c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.224-3.592M6.18 6.18A9.96 9.96 0 0112 5
+                    c4.477 0 8.268 2.943 9.542 7a9.958 9.958 0 01-4.199 5.818M15 12a3 3 0 11-6 0 3 3 0 016 0zM3 3l18 18"/>
+            `
+            : `
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5
+                    c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            `;
+    });
+}
+
 
 // Error handling for script loading
 window.onerror = function(message, source, lineno, colno, error) {
