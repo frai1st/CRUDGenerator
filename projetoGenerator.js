@@ -37,7 +37,7 @@ function gerarCodigoKnex(template) {
   const foreignConstraints = colunas
     .filter(([_, props]) => props.some(p => p.startsWith("foreign")))
     .map(([nome, props]) => {
-      const tabelaReferenciada = nome.replace(/ID$/i, '').toLowerCase() + 's'
+      const tabelaReferenciada = nome.replace(/ID$/i, '').toLowerCase()
       return `            table.foreign('${nome}').references('${tabelaReferenciada}.id')`
   }).join("\n")
 
@@ -70,8 +70,8 @@ function gerarEndpointsFastify(template) {
     .map(([nome, props]) => {
     const foreignAttr = props.find(p => p.startsWith("foreign."))
     const partes = foreignAttr.split('.')
-    const atributos = partes.slice(1) // consider everything after "foreign."
-    const tabelaRef = nome.replace(/ID$/i, '').toLowerCase() + 's'
+    const atributos = partes.slice(2) // consider everything after "foreign."
+    const tabelaRef = nome.replace(/ID$/i, '').toLowerCase()
     return { nome, tabelaRef, atributos }
   })
 
